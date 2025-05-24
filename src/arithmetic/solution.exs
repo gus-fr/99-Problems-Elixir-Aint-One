@@ -25,7 +25,8 @@ defmodule Arithmetic do
   the gcd using euclideqn algo. only poitive ints
   """
   @spec gcd(integer, integer) :: integer
-  def gcd(number1, number2) when is_integer(number1) and is_integer(number2) do
+  def gcd(number1, number2)
+      when is_integer(number1) and is_integer(number2) and number1 > 0 and number2 > 0 do
     gcd_recursive(max(number1, number2), min(number1, number2))
   end
 
