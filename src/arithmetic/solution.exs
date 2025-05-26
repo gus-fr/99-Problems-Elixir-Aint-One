@@ -68,12 +68,17 @@ defmodule Arithmetic do
   end
 
   defp first_factor(n) do
-    Stream.map(2..n, &rem(n, &1))
-    |> Stream.filter(&(rem(n, &1) == 0))
+    Stream.map(2..n, fn x -> {x, rem(n, x)} end)
+    |> Stream.filter(&(elem(&1, 1) == 0))
     |> Enum.take(1)
     |> List.first()
+    |> elem(0)
   end
 end
+
+IO.inspect(Arithmetic.prime_factors(1), label: "factorize 1")
+IO.inspect(Arithmetic.prime_factors(2), label: "factorize 2")
+IO.inspect(Arithmetic.prime_factors(60), label: "phi(1)")
 
 IO.inspect(Arithmetic.totient_phi(1), label: "phi(1)")
 IO.inspect(Arithmetic.totient_phi(10), label: "phi(10)=4")
