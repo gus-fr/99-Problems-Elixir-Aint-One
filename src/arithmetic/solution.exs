@@ -60,7 +60,7 @@ defmodule Arithmetic do
   def prime_factors(n), do: Enum.to_list(factor_stream(n))
 
   def factor_stream(n) do
-    Stream.resource(fn -> {2, n} end, &next_factor/1, fn factor_stream -> factor_stream end)
+    Stream.unfold({2, n}, &next_factor/1)
   end
 
   defp first_factor(n, start_from) do
@@ -77,14 +77,14 @@ defmodule Arithmetic do
   end
 
   defp next_factor({_, 1}) do
-    {:halt, 1}
+    nil
   end
 
   defp next_factor({current_factor, n}) when n > 1 and is_integer(n) do
     # returns the next prime factor, and reduces the acc by acc/factor
     factor = first_factor(n, current_factor)
     result = div(n, factor)
-    {[factor], {factor, result}}
+    {factor, {factor, result}}
   end
 end
 
