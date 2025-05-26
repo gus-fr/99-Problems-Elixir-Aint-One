@@ -68,11 +68,11 @@ defmodule Arithmetic do
   end
 
   defp first_factor(n) do
-    Stream.map(2..n, fn x -> {x, rem(n, x)} end)
-    |> Stream.filter(&(elem(&1, 1) == 0))
-    |> Enum.take(1)
-    |> List.first()
-    |> elem(0)
+    Stream.map(2..n, fn x -> {x, rem(n, x)} end) #{factor,remainder} for all numbers
+    |> Stream.filter(&(elem(&1, 1) == 0)) # filter only the numbers divisible by n
+    |> Enum.take(1) #take the first
+    |> List.first() #unwrap the list
+    |> elem(0) #take the factor from {factor,remainder} tuple
   end
 end
 
