@@ -37,8 +37,49 @@ defmodule Arithmetic do
       gcd_recursive(smaller, rem(bigger, smaller))
     end
   end
+
+  def coprime?(a, b), do: gcd(a, b) == 1
+
+  @doc """
+  Euler's so-called totient function phi(m)
+  is defined as the number of positive integers r (1 <= r < m) that are coprime to m.
+  """
+  @spec totient_phi(integer) :: integer
+  def totient_phi(1), do: 1
+
+  def totient_phi(n) when n > 1 do
+    Stream.map(1..(n - 1), &coprime?(&1, n))
+    |> Enum.count(&(&1 == true))
+  end
+
+  @doc """
+  fatorize
+  """
+  @spec prime_factors(integer) :: list(integer)
+  def prime_factors(1), do: [1]
+
+  def prime_factors(n) when n > 1 and is_integer(n) do
+    if prime?(n) do
+      [n]
+    else
+      factor = first_factor(n)
+      [factor | prime_factors(div(n, factor))]
+    end
+  end
+
+  defp first_factor(n) do
+    Stream.map(2..n, &rem(n, &1))
+    |> Stream.filter(&(rem(n, &1) == 0))
+    |> Enum.take(1)
+    |> List.first()
+  end
 end
 
+IO.inspect(Arithmetic.totient_phi(1), label: "phi(1)")
+IO.inspect(Arithmetic.totient_phi(10), label: "phi(10)=4")
+IO.inspect(Arithmetic.totient_phi(7727), label: "phi(7727)=7726")
+
+IO.inspect(Arithmetic.coprime?(35, 64), label: "oprime(35,64)=yes")
 IO.inspect(Arithmetic.gcd(3, 5), label: "GCD(5,3)=1")
 IO.inspect(Arithmetic.gcd(36, 63), label: "GCD(36,63)=9")
 IO.inspect(Arithmetic.gcd(1071, 462), label: "GCD(1071,462)=21")
