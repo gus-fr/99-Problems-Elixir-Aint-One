@@ -60,10 +60,10 @@ defmodule Arithmetic do
   def prime_factors(n), do: Enum.to_list(factor_stream(n))
 
   def factor_stream(n) do
-    Stream.resource(fn -> n end, &next_factor/1, fn factor_stream -> factor_stream end)
+    Stream.resource(fn -> {2, n} end, &next_factor/1, fn factor_stream -> factor_stream end)
   end
 
-  defp first_factor(n, start_from \\ 2) do
+  defp first_factor(n, start_from) do
     # {factor,remainder} for all numbers
     Stream.map(start_from..n, fn x -> {x, rem(n, x)} end)
     # filter only the numbers divisible by n
@@ -76,21 +76,23 @@ defmodule Arithmetic do
     |> elem(0)
   end
 
-
-  defp next_factor(1) do
-    {:halt, [1]}
+  defp next_factor({_, 1}) do
+    {:halt, 1}
   end
 
-  defp next_factor(n) when n > 1 and is_integer(n) do
-    factor = first_factor(n)
+  defp next_factor({current_factor, n}) when n > 1 and is_integer(n) do
+    # returns the next prime factor, and reduces the acc by acc/factor
+    factor = first_factor(n, current_factor)
     result = div(n, factor)
-    {[factor], result}
+    {[factor], {factor, result}}
   end
 end
 
 IO.inspect(Arithmetic.prime_factors(1), label: "factorize 1")
 IO.inspect(Arithmetic.prime_factors(2), label: "factorize 2")
-IO.inspect(Enum.take(Arithmetic.factor_stream(60), 10), label: "factorize 60")
+IO.inspect(Arithmetic.prime_factors(60), label: "factorize 60")
+IO.inspect(Arithmetic.prime_factors(1024), label: "factorize 1024")
+
 IO.inspect(Arithmetic.prime_factors(123_456_789), label: "factorize 123456789")
 
 IO.inspect(Arithmetic.totient_phi(1), label: "phi(1)")
