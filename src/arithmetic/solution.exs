@@ -78,7 +78,9 @@ end
 
 IO.inspect(Arithmetic.prime_factors(1), label: "factorize 1")
 IO.inspect(Arithmetic.prime_factors(2), label: "factorize 2")
-IO.inspect(Arithmetic.prime_factors(60), label: "phi(1)")
+IO.inspect(Arithmetic.prime_factors(60), label: "factorize 60")
+IO.inspect(Arithmetic.prime_factors(123456789), label: "factorize 123456789")
+
 
 IO.inspect(Arithmetic.totient_phi(1), label: "phi(1)")
 IO.inspect(Arithmetic.totient_phi(10), label: "phi(10)=4")
