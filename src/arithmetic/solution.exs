@@ -70,7 +70,7 @@ defmodule Arithmetic do
   defp first_factor(n) do
     Stream.map(2..n, fn x -> {x, rem(n, x)} end) #{factor,remainder} for all numbers
     |> Stream.filter(&(elem(&1, 1) == 0)) # filter only the numbers divisible by n
-    |> Enum.take(1) #take the first
+    |> Enum.take(1) #take the first one from the stream
     |> List.first() #unwrap the list
     |> elem(0) #take the factor from {factor,remainder} tuple
   end
