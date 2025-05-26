@@ -68,19 +68,23 @@ defmodule Arithmetic do
   end
 
   defp first_factor(n) do
-    Stream.map(2..n, fn x -> {x, rem(n, x)} end) #{factor,remainder} for all numbers
-    |> Stream.filter(&(elem(&1, 1) == 0)) # filter only the numbers divisible by n
-    |> Enum.take(1) #take the first one from the stream
-    |> List.first() #unwrap the list
-    |> elem(0) #take the factor from {factor,remainder} tuple
+    # {factor,remainder} for all numbers
+    Stream.map(2..n, fn x -> {x, rem(n, x)} end)
+    # filter only the numbers divisible by n
+    |> Stream.filter(&(elem(&1, 1) == 0))
+    # take the first one from the stream
+    |> Enum.take(1)
+    # unwrap the list
+    |> List.first()
+    # take the factor from {factor,remainder} tuple
+    |> elem(0)
   end
 end
 
 IO.inspect(Arithmetic.prime_factors(1), label: "factorize 1")
 IO.inspect(Arithmetic.prime_factors(2), label: "factorize 2")
 IO.inspect(Arithmetic.prime_factors(60), label: "factorize 60")
-IO.inspect(Arithmetic.prime_factors(123456789), label: "factorize 123456789")
-
+IO.inspect(Arithmetic.prime_factors(123_456_789), label: "factorize 123456789")
 
 IO.inspect(Arithmetic.totient_phi(1), label: "phi(1)")
 IO.inspect(Arithmetic.totient_phi(10), label: "phi(10)=4")
