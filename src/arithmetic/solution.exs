@@ -95,10 +95,17 @@ defmodule Arithmetic do
   end
 
   defp stream_pairs(stream) do
-    Stream.transform(stream, nil, fn
-      x, nil -> {[], x}
-      x, prev -> {[{prev, x}], x}
-    end)
+    Stream.transform(
+      stream,
+      fn -> nil end,
+      fn
+        x, nil -> {[], x}
+        x, prev -> {[{prev, x}], x}
+      end,
+      # sends a last pair
+      fn x -> {[{x, nil}], nil} end,
+      fn _ -> nil end
+    )
   end
 end
 
