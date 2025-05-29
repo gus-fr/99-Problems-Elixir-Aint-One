@@ -63,6 +63,9 @@ defmodule Arithmetic do
     Stream.unfold({2, n}, &next_factor/1)
   end
 
+  @doc """
+  fatorize with multiplicity
+  """
   def factor_mult(n) do
     Stream.transform(stream_pairs(factor_stream(n)), 1, fn
       {x, x}, acc -> {[], acc + 1}
