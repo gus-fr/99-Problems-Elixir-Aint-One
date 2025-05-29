@@ -63,6 +63,13 @@ defmodule Arithmetic do
     Stream.unfold({2, n}, &next_factor/1)
   end
 
+  def factor_mult(n) do
+    Stream.transform(stream_pairs(factor_stream(n)), 1, fn
+      {x, x}, acc -> {[], acc + 1}
+      {x, _}, acc -> {[{x, acc}], 1}
+    end)
+  end
+
   defp first_factor(n, start_from) do
     # {factor,remainder} for all numbers
     Stream.map(start_from..n, fn x -> {x, rem(n, x)} end)
@@ -86,7 +93,19 @@ defmodule Arithmetic do
     result = div(n, factor)
     {factor, {factor, result}}
   end
+
+  defp stream_pairs(stream) do
+    Stream.transform(stream, nil, fn
+      x, nil -> {[], x}
+      x, prev -> {[{prev, x}], x}
+    end)
+  end
 end
+
+IO.inspect(Enum.to_list(Arithmetic.factor_mult(1)), label: "factorize 1")
+IO.inspect(Enum.to_list(Arithmetic.factor_mult(2)), label: "factorize 2")
+IO.inspect(Enum.to_list(Arithmetic.factor_mult(60)), label: "factorize 60")
+IO.inspect(Enum.to_list(Arithmetic.factor_mult(1024)), label: "factorize 1024")
 
 IO.inspect(Arithmetic.prime_factors(1), label: "factorize 1")
 IO.inspect(Arithmetic.prime_factors(2), label: "factorize 2")
