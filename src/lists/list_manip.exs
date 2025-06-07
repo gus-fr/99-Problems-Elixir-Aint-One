@@ -92,7 +92,7 @@ defmodule ListManipulation do
       [] ->
         case input_list do
           [head, head | tail] -> pack([head | tail], [head])
-          [head | tail] -> [head | pack(tail)]
+          [head | tail] -> [[head] | pack(tail)]
           [] -> []
         end
 
@@ -108,21 +108,74 @@ defmodule ListManipulation do
             [current_pack | pack([head | tail], [head])]
 
           [head | tail] ->
-            [current_pack | [head | pack(tail)]]
+            [current_pack | [[head] | pack(tail)]]
         end
     end
   end
+
+  @doc "run length encoding"
+  @spec rle(list[any]) :: list[any]
+  def rle(input_list) do
+    Enum.map(pack(input_list), fn list -> {Enum.count(list), hd(list)} end)
+  end
+
+  @doc "run length encoding"
+  @spec rle_modified(list[any]) :: list[any]
+  def rle_modified(input_list) do
+    Enum.map(pack(input_list), fn list ->
+      case list do
+        [] -> []
+        [head | []] -> head
+        _ -> {Enum.count(list), hd(list)}
+      end
+    end)
+  end
 end
 
-IO.inspect(ListManipulation.pack([1], [2, 2]),
-  label: "pack 1..9"
+IO.inspect(ListManipulation.rle_modified([]), label: "rlemod []")
+IO.inspect(ListManipulation.rle_modified(["A"]), label: "rlemod 1")
+
+IO.inspect(ListManipulation.rle_modified(["A", "B", "C", "D", "D", "D", "E"]),
+  label: "rlemod 1..5"
 )
+
+IO.inspect(ListManipulation.rle([]), label: "rle []")
+IO.inspect(ListManipulation.rle(["A"]), label: "re 1")
+
+IO.inspect(ListManipulation.rle(["A", "B", "C", "D", "D", "D", "E"]),
+  label: "rle 1..5"
+)
+
+IO.inspect(
+  ListManipulation.rle([
+    "A",
+    "B",
+    "B",
+    "B",
+    "C",
+    "C",
+    "D",
+    "E",
+    "F",
+    "F",
+    "F",
+    "A",
+    "B",
+    "A",
+    "A",
+    "G"
+  ]),
+  label: "rle 1..9"
+)
+
+IO.inspect(ListManipulation.rle([1, 1, 1, 1, 1, 1, 1]), label: "rle 1")
+IO.inspect(ListManipulation.rle([1, 2, 2, 3, 3, 3, 4, 4, 4]), label: "rle 1..4")
 
 IO.inspect(ListManipulation.pack([]), label: "pack []")
 IO.inspect(ListManipulation.pack([1]), label: "pack 1")
 
 IO.inspect(ListManipulation.pack([1, 2, 3, 4, 4, 4, 5]),
-  label: "pack 1..9"
+  label: "pack 1..5"
 )
 
 IO.inspect(ListManipulation.pack([1, 2, 2, 2, 3, 3, 4, 5, 6, 6, 6, 1, 2, 1, 1, 9]),
