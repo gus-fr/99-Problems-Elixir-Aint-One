@@ -46,7 +46,7 @@ end
 
 defmodule Main do
   def main do
-    graph = Graph.new([1, 2, 3], [[1,2],[2,1],[3,1]], false)
+    graph = Graph.new([1, 2, 3], [[1, 2], [2, 1], [3, 1]], false)
     IO.inspect(graph, label: "test")
   end
 end
