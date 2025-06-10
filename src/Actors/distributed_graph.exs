@@ -19,6 +19,13 @@ defmodule Graph do
     graph
   end
 
+  def ping(graph, node) do
+    case Map.fetch(graph.nodes, node) do
+      {:ok, node_pid} -> send(node_pid, {:ping, []})
+      {:error, _} -> raise("bad ping node #{node}")
+    end
+  end
+
   defp add_node(node) do
     pid = spawn(fn -> node_loop(GraphNode.new(node)) end)
     {node, pid}
@@ -47,9 +54,19 @@ defmodule Graph do
   end
 
   defp process_node_message(node_state, {:add_neighbor, neighbor}) do
-    put_in(node_state.neighbors, neighbor)
+    update_in(node_state.neighbors, &MapSet.put(&1, neighbor))
+  end
+
+  defp process_node_message(node_state, {:ping, stak_call}) do
+    IO.inspect(stak_call, label: "node #{node_state.node_id} called w stack")
+    Enum.each(node_state.neighbors, &send(&1, {:ping, [node_state.node_id | stak_call]}))
+
+    node_state
   end
 end
 
-a = Graph.new([1, 2, 3, 4], [[1, 2], [2, 3], [2, 4]])
-IO.inspect(a, label: "factorize 1")
+g = Graph.new([1, 2, 3, 4], [[1, 2], [2, 3], [2, 4]])
+Graph.ping(g, 1)
+IO.puts("foo")
+:timer.sleep(1000)
+IO.puts("bar")
