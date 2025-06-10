@@ -1,29 +1,17 @@
 defmodule Graph do
   defstruct nodes: Map.new(), edges: MapSet.new(), directed: false
 
-  def new(nodes, edges, directed \\ false) do
+  def new(nodes, _edges, directed \\ false) do
     %Graph{
-      nodes: MapSet.new(nodes, nodes),
-      edges: MapSet.new(edges),
+      nodes: Map.new(nodes, &add_node(&1)),
+      edges: [],
       directed: directed
     }
   end
 
-  def add_node(graph, node_key, node) do
-    Map.put(graph.nodes, node_key, node)
-  end
-end
-
-defmodule GraphServer do
-  def new(graph) do
-
-    Enum.each(graph.nodes,&add_node(,&1))
-
-  end
-
-  def add_node(graph, node) do
+  defp add_node(node) do
     pid = spawn(fn -> node_loop(MapSet.new()) end)
-    Graph.add_node(graph, pid, node)
+    {node, pid}
   end
 
   defp node_loop(node_state) do
@@ -40,5 +28,5 @@ defmodule GraphServer do
   end
 end
 
-GraphServer.new()
-IO.inspect(Enum.to_list(Arithmetic.factor_mult(1)), label: "factorize 1")
+a = Graph.new([1, 2], [1, 2])
+IO.inspect(a, label: "factorize 1")
