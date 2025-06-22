@@ -69,8 +69,9 @@ defmodule Graph do
   end
 end
 
-g = Graph.new([1, 2, 3, 4, 5], [[1, 2], [2, 3], [2, 4], [3, 2], [4, 5], [3, 5]])
+g = Graph.new([1, 2, 3, 4, 5], [[1, 2], [2, 3], [2, 4], [3, 2], [4, 5], [3, 5], [5,1]])
 Graph.ping(g, 1)
+Graph.ping(g, 5)
 IO.puts("foo")
 :timer.sleep(1000)
 IO.puts("bar")
