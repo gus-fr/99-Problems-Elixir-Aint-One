@@ -39,8 +39,8 @@ defmodule Graph do
           {:error, _} -> raise("bad to node #{to}")
         end
 
-      {:error, _} ->
-        raise("bad from node #{from}")
+      :error ->
+        raise("bad node: '#{from}'")
     end
   end
 
@@ -65,7 +65,7 @@ defmodule Graph do
   end
 end
 
-g = Graph.new([1, 2, 3, 4], [[1, 2], [2, 3], [2, 4]])
+g = Graph.new([1, 2, 3, 4], [[1, 2], [2, 3], [2, 4], [5, 3]])
 Graph.ping(g, 1)
 IO.puts("foo")
 :timer.sleep(1000)
