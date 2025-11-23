@@ -36,7 +36,7 @@ defmodule Graph do
       {:ok, from_pid} ->
         case Map.fetch(graph.nodes, to) do
           {:ok, to_pid} -> send(from_pid, {:add_neighbor, to_pid})
-          {:error, _} -> raise("bad to node #{to}")
+          :error -> raise("bad to node #{to}")
         end
 
       :error ->
@@ -69,7 +69,7 @@ defmodule Graph do
   end
 end
 
-g = Graph.new([1, 2, 3, 4, 5], [[1, 2], [2, 3], [2, 4], [3, 2], [4, 5], [3, 5], [5,1]])
+g = Graph.new([1, 2, 3, 4, 5], [[1, 2], [1, 3], [2, 4], [2, 6], [3, 5], [3, 7], [7,1]])
 Graph.ping(g, 1)
 Graph.ping(g, 5)
 IO.puts("foo")
