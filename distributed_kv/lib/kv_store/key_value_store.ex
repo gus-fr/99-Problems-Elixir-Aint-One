@@ -23,6 +23,10 @@ defmodule KVStore.KeyValueStore do
     GenServer.start(KVStore.KeyValueStore, nil)
   end
 
+  @doc """
+  put a value in the kv store
+  """
+  @spec put(GenServer.server(), term(), term()) :: :ok
   def put(pid, key, value) do
     GenServer.cast(pid, {:put, key, value})
   end
