@@ -24,10 +24,10 @@ defmodule KVStore.Cache do
   end
 
   def start do
-    GenServer.start(__MODULE__, nil)
+    GenServer.start(__MODULE__, nil, name: __MODULE__)
   end
 
-  def server_process(cache_pid, kv_name) do
-    GenServer.call(cache_pid, {:server_process, kv_name})
+  def server_process(kv_name) do
+    GenServer.call(__MODULE__, {:server_process, kv_name})
   end
 end
