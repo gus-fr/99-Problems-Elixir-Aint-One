@@ -7,7 +7,7 @@ defmodule AdventOfCode.GiftShop do
 
   @file_name "input/input_day2.txt"
 
-  def main() do
+  def main_part1() do
     File.read!(@file_name)
     |> String.split(",")
     |> Enum.map(&String.split(&1, "-"))
