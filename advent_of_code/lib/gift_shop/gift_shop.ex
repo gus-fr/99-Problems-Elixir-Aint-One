@@ -12,7 +12,7 @@ defmodule AdventOfCode.GiftShop do
     |> String.split(",")
     |> Enum.map(&String.split(&1, "-"))
     |> Enum.map(&tuple_to_range/1)
-    |> Enum.map(&invalid_id_sum/1)
+    |> Enum.map(&invalid_id_twice/1)
     |> Enum.sum()
   end
 
@@ -27,7 +27,7 @@ defmodule AdventOfCode.GiftShop do
     |> Enum.sum()
   end
 
-  defp invalid_id?(int_id) do
+  defp invalid_id_twice?(int_id) do
     digits = floor(:math.log10(int_id)) + 1
     shift = 10 ** div(digits, 2)
 
