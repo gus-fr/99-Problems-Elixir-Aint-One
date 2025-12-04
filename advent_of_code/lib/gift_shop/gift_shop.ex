@@ -7,17 +7,27 @@ defmodule AdventOfCode.GiftShop do
 
   @file_name "input/input_day2.txt"
 
-
   def main() do
     File.read!(@file_name)
     |> String.split(",")
-    |> Enum.map(&String.split(&1,"-"))
-
-
-
+    |> Enum.map(&String.split(&1, "-"))
+    |> Enum.map(&tuple_to_range/1)
   end
 
-  defp expand_range(first,last) do
-    first..last
+  defp tuple_to_range([first, last]) do
+    {first_num, _} = Integer.parse(first)
+    {last_num, _} = Integer.parse(last)
+    first_num..last_num
+  end
+
+  defp invalid_id?(int_id) do
+    digits = floor(:math.log10(int_id)) + 1
+    shift = 10 ** div(digits, 2)
+
+    if Integer.mod(digits, 2) == 0 do
+      Integer.mod(int_id, shift) == div(int_id, shift)
+    else
+      false
+    end
   end
 end
