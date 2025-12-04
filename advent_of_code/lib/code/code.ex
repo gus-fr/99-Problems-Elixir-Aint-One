@@ -2,14 +2,14 @@ defmodule AdventOfCode.Code do
   @moduledoc """
   code for day 1 of AOC 2025
   https://adventofcode.com/2025/day/1
-  usage AdventOfCode.Code.decode
+  usage AdventOfCode.Code.main
   """
 
   @file_name "input/input_day1.txt"
   @size_lock 100
   @start_position 50
 
-  def decode() do
+  def main() do
     File.stream!(@file_name)
     |> Stream.map(&String.trim/1)
     |> Stream.map(&decode_rotation/1)
