@@ -12,7 +12,7 @@ defmodule AdventOfCode.GiftShop do
     |> String.split(",")
     |> Enum.map(&String.split(&1, "-"))
     |> Enum.map(&tuple_to_range/1)
-    |> Enum.map(&invalid_id_twice/1)
+    |> Enum.map(&invalid_id_sum_part1/1)
     |> Enum.sum()
   end
 
@@ -22,8 +22,8 @@ defmodule AdventOfCode.GiftShop do
     first_num..last_num
   end
 
-  def invalid_id_sum(range) do
-    Stream.filter(range, &invalid_id?/1)
+  def invalid_id_sum_part1(range) do
+    Stream.filter(range, &invalid_id_twice?/1)
     |> Enum.sum()
   end
 
