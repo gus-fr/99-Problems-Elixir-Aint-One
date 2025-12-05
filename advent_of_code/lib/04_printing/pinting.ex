@@ -8,7 +8,27 @@ defmodule AdventOfCode.Printing do
   @file_name "input/input_day4.txt"
 
   def main() do
-    read_matrix(@file_name)
+    matrix = read_matrix(@file_name)
+
+    convo2d(matrix, 1)
+    |> Enum.filter(fn x -> x < 4 end)
+    |> length
+  end
+
+  # line_above == nil -> Stream.repeatedly(fn -> 0 end)
+  def convo2d(matrix, window_size) do
+    height = length(matrix) - 1
+    width = length(List.first(matrix)) - 1
+
+    for i <- 0..height,
+        j <- 0..width,
+        Enum.at(Enum.at(matrix, i), j) == 1,
+        do: Enum.sum(Enum.map(matrix_slice(matrix, i, j, window_size), &Enum.sum/1)) - 1
+  end
+
+  defp matrix_slice(matrix, i, j, window_size) do
+    Enum.slice(matrix, max(i - window_size, 0)..(i + window_size))
+    |> Enum.map(&Enum.slice(&1, max(j - window_size, 0)..(j + window_size)))
   end
 
   def read_matrix(file_name) do
