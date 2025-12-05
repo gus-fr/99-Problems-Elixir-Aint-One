@@ -2,7 +2,6 @@ defmodule AdventOfCode.Code do
   @moduledoc """
   code for day 1 of AOC 2025
   https://adventofcode.com/2025/day/1
-  usage AdventOfCode.Code.main
   """
 
   @file_name "input/input_day1.txt"
