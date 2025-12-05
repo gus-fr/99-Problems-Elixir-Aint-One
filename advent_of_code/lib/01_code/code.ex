@@ -11,9 +11,14 @@ defmodule AdventOfCode.Code do
 
   def main_part_1() do
     decode_lock_rotations()
-    |> Stream.scan({0,@start_position}, &rotate/2)
+    |> Stream.scan({0, @start_position}, &rotate/2)
     |> Stream.filter(&lock_in_zero?/1)
     |> Enum.reduce(0, fn _, acc -> acc + 1 end)
+  end
+
+  def main_part_2() do
+    decode_lock_rotations()
+    |> Enum.reduce({0, @start_position}, &rotate/2)
   end
 
   defp decode_lock_rotations() do
@@ -24,8 +29,8 @@ defmodule AdventOfCode.Code do
 
   defp lock_in_zero?(lock_state) do
     case lock_state do
-      {_,0} -> true
-      {_,_} -> false
+      {_, 0} -> true
+      {_, _} -> false
     end
   end
 
@@ -44,7 +49,15 @@ defmodule AdventOfCode.Code do
     end
   end
 
-  defp rotate({:ok, code}, {zero_counts,current_position}) do
-    {zero_counts+div(current_position+code,@size_lock),Integer.mod(current_position + code, @size_lock)}
+  defp rotate({:ok, code}, {zero_counts, current_position}) do
+    new_code = current_position + code
+
+    if new_code <= 0 and current_position > 0 do
+      {1 + zero_counts + abs(div(current_position + code, @size_lock)),
+       Integer.mod(current_position + code, @size_lock)}
+    else
+      {zero_counts + abs(div(current_position + code, @size_lock)),
+       Integer.mod(current_position + code, @size_lock)}
+    end
   end
 end
