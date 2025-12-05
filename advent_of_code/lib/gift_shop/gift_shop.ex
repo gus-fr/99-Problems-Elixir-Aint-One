@@ -3,7 +3,7 @@ defmodule AdventOfCode.GiftShop do
   code for day 2 of AOC 2025
   https://adventofcode.com/2025/day/2
   usage AdventOfCode.GiftShop.main(&AdventOfCode.GiftShop.invalid_id_twice?/1) fo part 1
-
+  AdventOfCode.GiftShop.main(&AdventOfCode.GiftShop.invalid_id_muli?/1) fo part 2
   """
 
   @file_name "input/input_day2.txt"
@@ -53,7 +53,7 @@ defmodule AdventOfCode.GiftShop do
     end
   end
 
-  def repeated_patten?(pattern_size, list) do
+  defp repeated_patten?(pattern_size, list) do
     {pattern, rest} = Enum.split(list, pattern_size)
 
     cond do
