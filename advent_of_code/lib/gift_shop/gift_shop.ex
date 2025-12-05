@@ -38,4 +38,29 @@ defmodule AdventOfCode.GiftShop do
       false
     end
   end
+
+  def invalid_id_muli?(int_id) do
+    digits = Integer.digits(int_id)
+
+    case length(digits) do
+      1 ->
+        false
+
+      _ ->
+        1..div(length(digits), 2)
+        |> Enum.map(&repeated_patten?(&1, digits))
+        |> Enum.any?()
+    end
+  end
+
+  def repeated_patten?(pattern_size, list) do
+    {pattern, rest} = Enum.split(list, pattern_size)
+
+    cond do
+      length(rest) ==pattern_size -> pattern == rest
+      length(rest) ==0 -> false
+      pattern == Enum.take(rest, pattern_size) -> repeated_patten?(pattern_size, rest)
+      true -> false
+    end
+  end
 end
