@@ -33,6 +33,7 @@ defmodule AdventOfCode.Lobby do
   end
 
   defp max_item_at(digit_list, stop_at) do
+    # max value and the index it's at
     {max_index, _, max_value} =
       Enum.reduce_while(digit_list, {0, 0, 1}, &max_lookup(&1, &2, stop_at))
 
