@@ -10,12 +10,17 @@ defmodule AdventOfCode.Code do
   @start_position 50
 
   def main() do
+    decode_lock_rotations()
+    |> Stream.scan({0,@start_position}, &rotate/2)
+
+    #  |> Stream.filter(&(&1 == 0))
+    |> Enum.reduce(0, fn _, acc -> acc + 1 end)
+  end
+
+  defp decode_lock_rotations() do
     File.stream!(@file_name)
     |> Stream.map(&String.trim/1)
     |> Stream.map(&decode_rotation/1)
-    |> Stream.scan(@start_position, &rotate/2)
-    |> Stream.filter(&(&1 == 0))
-    |> Enum.reduce(0, fn _, acc -> acc + 1 end)
   end
 
   defp decode_rotation(input_rotation) do
@@ -33,7 +38,7 @@ defmodule AdventOfCode.Code do
     end
   end
 
-  defp rotate({:ok, code}, accumulator) do
-    Integer.mod(accumulator + code, @size_lock)
+  defp rotate({:ok, code}, {zero_counts,current_position}) do
+    {zero_counts+div(current_position+code,@size_lock),Integer.mod(current_position + code, @size_lock)}
   end
 end
