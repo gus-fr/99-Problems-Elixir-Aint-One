@@ -1,4 +1,4 @@
-defmodule AdventOfCode.Code do
+defmodule AdventOfCode.SecetEntrance do
   @moduledoc """
   code for day 1 of AOC 2025
   https://adventofcode.com/2025/day/1
