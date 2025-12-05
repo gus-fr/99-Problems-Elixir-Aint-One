@@ -15,11 +15,11 @@ defmodule AdventOfCode.Printing do
     File.stream!(file_name)
     |> Stream.map(&String.trim/1)
     |> Stream.map(&String.graphemes/1)
-    |> Stream.map(&Enum.map(&1, fn x -> to_bool!(x) end))
+    |> Stream.map(&Enum.map(&1, fn x -> char_to_bool!(x) end))
     |> Enum.to_list()
   end
 
-  defp to_bool!(char) do
+  defp char_to_bool!(char) do
     case char do
       "@" -> 1
       "." -> 0
