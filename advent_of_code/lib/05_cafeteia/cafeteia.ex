@@ -10,17 +10,21 @@ defmodule AdventOfCode.Cafeteria do
   def main do
     File.stream!(@file_name)
     |> Stream.map(&String.trim/1)
-    |> Enum.reduce({[], []}, &add_to_list/2)
+    |> Enum.reduce({[], []}, &build_database/2)
   end
 
-  defp add_to_list(element, {range_list, item_list}) do
+  defp build_database(element, {range_list, item_list}) do
     range_match = Regex.run(~r/(\d*)-(\d*)/, element)
-    
 
     cond do
-      range_match != nil -> {[parse_range(range_match) | range_list], item_list}
-      Regex.match?(~r/(\d+)/, element) ->{range_list, [elem(Integer.parse(element),0)|item_list]}
-      true -> {range_list, item_list}
+      range_match != nil ->
+        {[parse_range(range_match) | range_list], item_list}
+
+      Regex.match?(~r/(\d+)/, element) ->
+        {range_list, [elem(Integer.parse(element), 0) | item_list]}
+
+      true ->
+        {range_list, item_list}
     end
   end
 
