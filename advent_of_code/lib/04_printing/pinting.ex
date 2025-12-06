@@ -8,11 +8,32 @@ defmodule AdventOfCode.Printing do
   @file_name "input/input_day4.txt"
   @kernel [[1, 1, 1], [1, 0, 1], [1, 1, 1]]
 
-  def main() do
+  def main(max_cycles) do
     matrix = read_matrix(@file_name)
+    remove_in_cycles(matrix, 1, max_cycles)
+  end
 
-    -1*(convo2d(pad_matrix(matrix, 1), 1)
-    |> Enum.sum())
+  defp remove_in_cycles(matrix, window_size, max_cycles) do
+    cond do
+      max_cycles == 0 ->
+        0
+
+      true ->
+        width = length(List.first(matrix))
+        rolls_to_remove = convo2d(pad_matrix(matrix, 1), 1)
+        num_rolls_removed = -1 * Enum.sum(rolls_to_remove)
+
+        if num_rolls_removed == 0 do
+          0
+        else
+          new_matrix =
+            Enum.chunk_every(rolls_to_remove, width)
+            |> matrix_sum(matrix)
+            |> Enum.chunk_every(width)
+
+          num_rolls_removed + remove_in_cycles(new_matrix, window_size, max_cycles - 1)
+        end
+    end
   end
 
   defp convo2d(matrix, window_size) do
@@ -35,6 +56,11 @@ defmodule AdventOfCode.Printing do
     else
       0
     end
+  end
+
+  defp matrix_sum(matrix1, matrix2) do
+    Stream.zip(List.flatten(matrix1), List.flatten(matrix2))
+    |> Enum.map(fn {x, y} -> x + y end)
   end
 
   defp matrix_prodsum(matrix1, matrix2) do
