@@ -2,7 +2,8 @@ defmodule AdventOfCode.Printing do
   @moduledoc """
   code for day 4 of AOC 2025
   https://adventofcode.com/2025/day/4
-  usage
+  usage AdventOfCode.Printing.main(1) for part 1
+  AdventOfCode.Printing.main(-1) for part 2
   """
 
   @file_name "input/input_day4.txt"
