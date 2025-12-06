@@ -8,9 +8,13 @@ defmodule AdventOfCode.Cafeteria do
   @file_name "input/input_day5.txt"
 
   def main do
-    File.stream!(@file_name)
-    |> Stream.map(&String.trim/1)
-    |> Enum.reduce({[], []}, &update_database/2)
+    {ranges, ingredients} =
+      File.stream!(@file_name)
+      |> Stream.map(&String.trim/1)
+      |> Enum.reduce({[], []}, &update_database/2)
+
+    Enum.map(ingredients, &fresh?(&1, ranges))
+    |> Enum.reduce(0,fn x, acc -> if x == true do 1+acc else acc end end)
   end
 
   defp update_database(element, {range_list, item_list}) do
@@ -26,6 +30,10 @@ defmodule AdventOfCode.Cafeteria do
       true ->
         {range_list, item_list}
     end
+  end
+
+  defp fresh?(ingredient, ranges) do
+    Enum.any?(ranges,fn range -> ingredient in range end)
   end
 
   defp parse_range([_, low, high]) do
