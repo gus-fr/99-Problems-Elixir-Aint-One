@@ -11,26 +11,33 @@ defmodule AdventOfCode.Printing do
   def main() do
     matrix = read_matrix(@file_name)
 
-    convo2d(matrix, 1)
-    |> Enum.filter(fn x -> x < 4 end)
-    |> length
+    -1*(convo2d(pad_matrix(matrix, 1), 1)
+    |> Enum.sum())
   end
 
-  def convo2d(matrix, window_size) do
+  defp convo2d(matrix, window_size) do
     height = length(matrix) - 1
     width = length(List.first(matrix)) - 1
 
     for i <- window_size..(height - window_size),
         j <- window_size..(width - window_size),
-        Enum.at(Enum.at(matrix, i), j) == 1,
-        do: apply_convolution_fn(matrix_slice(matrix, i, j, window_size))
+        do:
+          (if(Enum.at(Enum.at(matrix, i), j) == 1) do
+             apply_convolution_fn(matrix_slice(matrix, i, j, window_size))
+           else
+             0
+           end)
   end
 
   defp apply_convolution_fn(sliced_matrix) do
-    matrix_prodsum(sliced_matrix, @kernel)
+    if matrix_prodsum(sliced_matrix, @kernel) < 4 do
+      -1
+    else
+      0
+    end
   end
 
-  def matrix_prodsum(matrix1, matrix2) do
+  defp matrix_prodsum(matrix1, matrix2) do
     Stream.zip(List.flatten(matrix1), List.flatten(matrix2))
     |> Enum.reduce(0, fn {x, y}, acc -> acc + x * y end)
   end
@@ -58,7 +65,6 @@ defmodule AdventOfCode.Printing do
     |> Stream.map(&String.graphemes/1)
     |> Stream.map(&Enum.map(&1, fn x -> char_to_bool!(x) end))
     |> Enum.to_list()
-    |> pad_matrix(1)
   end
 
   defp char_to_bool!(char) do
