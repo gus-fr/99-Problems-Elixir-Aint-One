@@ -10,7 +10,7 @@ defmodule AdventOfCode.Cafeteria do
   @file_name "input/input_day5.txt"
 
   def fresh_ingredient_from_list do
-    {ranges, ingredients} = load_data
+    {ranges, ingredients} = load_data()
 
     Enum.map(ingredients, &fresh?(&1, ranges))
     |> Enum.reduce(0, fn x, acc ->
@@ -23,7 +23,7 @@ defmodule AdventOfCode.Cafeteria do
   end
 
   def fresh_ingredient_from_range do
-    {ranges, _} = load_data
+    {ranges, _} = load_data()
   end
 
   defp load_data() do
