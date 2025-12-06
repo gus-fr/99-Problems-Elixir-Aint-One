@@ -6,13 +6,14 @@ defmodule AdventOfCode.Printing do
   """
 
   @file_name "input/input_day4.txt"
+  @kernel [[1, 1, 1], [1, 0, 1], [1, 1, 1]]
 
   def main() do
     matrix = read_matrix(@file_name)
 
     convo2d(matrix, 1)
-    |> Enum.filter(fn x -> x < 4 end)
-    |> length
+    #|> Enum.filter(fn x -> x < 4 end)
+    #|> length
   end
 
   # line_above == nil -> Stream.repeatedly(fn -> 0 end)
@@ -23,7 +24,16 @@ defmodule AdventOfCode.Printing do
     for i <- 0..height,
         j <- 0..width,
         Enum.at(Enum.at(matrix, i), j) == 1,
-        do: Enum.sum(Enum.map(matrix_slice(matrix, i, j, window_size), &Enum.sum/1)) - 1
+        do: apply_convolution_fn(matrix_slice(matrix, i, j, window_size))
+  end
+
+  defp apply_convolution_fn(sliced_matrix) do
+    matrix_prodsum(sliced_matrix, @kernel)
+  end
+
+  def matrix_prodsum(matrix1, matrix2) do
+    Stream.zip(List.flatten(matrix1), List.flatten(matrix2))
+    |> Enum.reduce(0,fn {x, y}, acc -> acc + x * y end)
   end
 
   defp matrix_slice(matrix, i, j, window_size) do
