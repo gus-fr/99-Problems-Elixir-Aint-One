@@ -10,10 +10,10 @@ defmodule AdventOfCode.Cafeteria do
   def main do
     File.stream!(@file_name)
     |> Stream.map(&String.trim/1)
-    |> Enum.reduce({[], []}, &build_database/2)
+    |> Enum.reduce({[], []}, &update_database/2)
   end
 
-  defp build_database(element, {range_list, item_list}) do
+  defp update_database(element, {range_list, item_list}) do
     range_match = Regex.run(~r/(\d*)-(\d*)/, element)
 
     cond do
