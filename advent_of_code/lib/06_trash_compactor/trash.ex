@@ -7,13 +7,51 @@ defmodule AdventOfCode.TrashCompactor do
 
   @file_name "input/input_day6.txt"
 
-  def main() do
+  def part1 do
     read_matrix(@file_name)
     |> transpose
     |> Stream.map(&parse_symbols/1)
     |> Stream.map(&solve_problem/1)
     |> Enum.sum()
   end
+
+
+
+  def main() do
+    text_list = File.stream!(@file_name)
+    |> Stream.map(&String.replace(&1,"\n",""))
+    |> Enum.to_list()
+
+    num_to_split = get_number_ranges(Enum.at(text_list,4))
+
+    Stream.map(text_list,&split_string(&1,num_to_split))
+    |> Enum.to_list()
+    |> transpose
+
+
+    #    |> Stream.map(&parse_symbols/1)
+    #    |> Stream.map(&solve_problem/1)
+    #    |> Enum.sum()
+  end
+
+  defp split_string(string,[head|tail]) do
+      tuple = String.split_at(string,head+1)
+      [String.slice(elem(tuple,0),0..-2//1)|split_string(elem(tuple,1),tail)]
+  end
+
+  defp split_string(_,[]) do
+      []
+  end
+
+
+  defp get_number_ranges(operation_list) do
+    operation_list
+    |> String.split(~r/\S+/)
+    |> Enum.map(&String.length/1)
+    |> tl
+  end
+
+
 
   defp read_matrix(file_name) do
     File.stream!(file_name)
