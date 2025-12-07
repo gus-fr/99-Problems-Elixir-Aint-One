@@ -25,8 +25,10 @@ defmodule AdventOfCode.TrashCompactor do
     num_to_split = get_number_ranges(Enum.at(text_list,4))
 
     Stream.map(text_list,&split_string(&1,num_to_split))
-    |> Enum.to_list()
     |> transpose
+    |> Stream.map(fn x -> Enum.map(x,&pad_symbol/1) end)
+    |> Enum.to_list()
+
 
 
     #    |> Stream.map(&parse_symbols/1)
@@ -34,13 +36,31 @@ defmodule AdventOfCode.TrashCompactor do
     #    |> Enum.sum()
   end
 
+  defp split_string(string,[_|[]]) do
+    [string]
+  end
+
   defp split_string(string,[head|tail]) do
       tuple = String.split_at(string,head+1)
       [String.slice(elem(tuple,0),0..-2//1)|split_string(elem(tuple,1),tail)]
   end
 
-  defp split_string(_,[]) do
-      []
+
+
+  defp pad_symbol(symbol) do
+    cond do
+      Regex.match?(~r/\s*\d+\s*/, symbol) ->
+        String.replace(symbol," ","0")
+
+      Regex.match?(~r/\s*\+\s*/, symbol) ->
+        String.replace(symbol," ","+")
+
+      Regex.match?(~r/\s*\*\s*/, symbol) ->
+        String.replace(symbol," ","*")
+
+      true ->
+        raise("sth went match for #{symbol} not found")
+    end
   end
 
 
