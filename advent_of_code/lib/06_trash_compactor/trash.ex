@@ -15,54 +15,75 @@ defmodule AdventOfCode.TrashCompactor do
     |> Enum.sum()
   end
 
-
-
   def main() do
-    text_list = File.stream!(@file_name)
-    |> Stream.map(&String.replace(&1,"\n",""))
-    |> Enum.to_list()
+    text_list =
+      File.stream!(@file_name)
+      |> Stream.map(&String.replace(&1, "\n", ""))
+      |> Enum.to_list()
 
-    num_to_split = get_number_ranges(Enum.at(text_list,4))
+    num_to_split = get_number_ranges(Enum.at(text_list, 4))
 
-    Stream.map(text_list,&split_string(&1,num_to_split))
+    Stream.map(text_list, &split_string(&1, num_to_split))
     |> transpose
-    |> Stream.map(fn x -> Enum.map(x,&pad_symbol/1) end)
-    |> Enum.to_list()
-
-
-
-    #    |> Stream.map(&parse_symbols/1)
-    #    |> Stream.map(&solve_problem/1)
-    #    |> Enum.sum()
+    |> Stream.map(fn x -> Enum.map(x, &pad_symbol/1) end)
+    |> Stream.map(fn x -> Enum.map(x, &String.graphemes/1) end)
+    |> Stream.map(&transpose/1)
+    |> Stream.map(fn x -> Enum.map(x, &digitize(&1, 0)) end)
+    |> Stream.map(&solve_problem_vertival/1)
+    |> Enum.sum()
   end
 
-  defp split_string(string,[_|[]]) do
+  defp solve_problem_vertival([{number, _} | []]) do
+    number
+  end
+
+  defp solve_problem_vertival([{number, operation} | tail]) do
+    operation.(number, solve_problem_vertival(tail))
+  end
+
+  defp digitize([operator | []], acc) do
+    cond do
+      operator == "+" -> {acc, &+/2}
+      operator == "*" -> {acc, &*/2}
+      true -> raise("sth went wrong")
+    end
+  end
+
+  defp digitize([digit | tail], acc) do
+    cond do
+      Regex.match?(~r/(\d+)/, digit) ->
+        digitize(tail, acc * 10 + elem(Integer.parse(digit), 0))
+      digit=="x" -> digitize(tail, acc)
+
+      true ->
+        raise("sth went wrong #{digit}, #{acc}")
+    end
+  end
+
+  defp split_string(string, [_ | []]) do
     [string]
   end
 
-  defp split_string(string,[head|tail]) do
-      tuple = String.split_at(string,head+1)
-      [String.slice(elem(tuple,0),0..-2//1)|split_string(elem(tuple,1),tail)]
+  defp split_string(string, [head | tail]) do
+    tuple = String.split_at(string, head + 1)
+    [String.slice(elem(tuple, 0), 0..-2//1) | split_string(elem(tuple, 1), tail)]
   end
-
-
 
   defp pad_symbol(symbol) do
     cond do
       Regex.match?(~r/\s*\d+\s*/, symbol) ->
-        String.replace(symbol," ","0")
+        String.replace(symbol, " ", "x")
 
       Regex.match?(~r/\s*\+\s*/, symbol) ->
-        String.replace(symbol," ","+")
+        String.replace(symbol, " ", "+")
 
       Regex.match?(~r/\s*\*\s*/, symbol) ->
-        String.replace(symbol," ","*")
+        String.replace(symbol, " ", "*")
 
       true ->
         raise("sth went match for #{symbol} not found")
     end
   end
-
 
   defp get_number_ranges(operation_list) do
     operation_list
@@ -70,8 +91,6 @@ defmodule AdventOfCode.TrashCompactor do
     |> Enum.map(&String.length/1)
     |> tl
   end
-
-
 
   defp read_matrix(file_name) do
     File.stream!(file_name)
