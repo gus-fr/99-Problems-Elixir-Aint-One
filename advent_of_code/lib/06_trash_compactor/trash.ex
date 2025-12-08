@@ -54,7 +54,9 @@ defmodule AdventOfCode.TrashCompactor do
     cond do
       Regex.match?(~r/(\d+)/, digit) ->
         digitize(tail, acc * 10 + elem(Integer.parse(digit), 0))
-      digit=="x" -> digitize(tail, acc)
+
+      digit == "x" ->
+        digitize(tail, acc)
 
       true ->
         raise("sth went wrong #{digit}, #{acc}")
