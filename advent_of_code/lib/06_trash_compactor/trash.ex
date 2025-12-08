@@ -16,6 +16,7 @@ defmodule AdventOfCode.TrashCompactor do
   end
 
   def main() do
+    # solve part 2
     text_list =
       File.stream!(@file_name)
       |> Stream.map(&String.replace(&1, "\n", ""))
