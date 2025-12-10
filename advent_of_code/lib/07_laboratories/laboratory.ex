@@ -12,14 +12,24 @@ defmodule AdventOfCode.Laboratory do
       read_input_stream()
       |> Stream.map(&decode_line/1)
 
-    test =
-      advance_beam(Enum.at(lines, 0), {[], 0}, Enum.at(lines, 1))
-      #|> elem(0)
-      #IO.inspect(test, charlists: :as_lists)
+    first = Stream.take(lines, 1) |> Enum.at(0)
+    rest = Stream.drop(lines, 1)
+    advance_all_beams(first, rest)
   end
 
-  defp advance_all_beams() do
+  defp advance_all_beams(current_beams, splitters) do
+    splitter = Stream.take(splitters, 1) |> Enum.at(0)
+    # IO.puts("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    # IO.inspect(Enum.to_list(splitters), charlists: false)
 
+    cond do
+      splitter == nil ->
+        0
+
+      length(splitter) > 0 ->
+        {new_beams, num_splits} = advance_beam(current_beams, {[], 0}, splitter)
+        num_splits + advance_all_beams(new_beams, Stream.drop(splitters, 1))
+    end
   end
 
   defp read_input_stream() do
@@ -36,23 +46,25 @@ defmodule AdventOfCode.Laboratory do
     |> Enum.to_list()
   end
 
-  defp advance_beam([beam_idx | []], {new_beams, splits}, spliter_idxs) do
+  def advance_beam([beam_idx | []], {new_beams, splits}, spliter_idxs) do
     if Enum.member?(spliter_idxs, beam_idx) do
-      {[beam_idx - 1, beam_idx + 1 | new_beams], splits + 1}
+      {Enum.uniq([beam_idx - 1, beam_idx + 1 | new_beams]), splits + 1}
     else
-      {[beam_idx | new_beams], splits}
+      {Enum.uniq([beam_idx | new_beams]), splits}
     end
   end
 
-  defp advance_beam([beam_idx | other_beams], {new_beams, splits}, spliter_idxs) do
+  def advance_beam([beam_idx | other_beams], {new_beams, splits}, spliter_idxs) do
+    # IO.inspect(new_beams, charlists: :as_lists)
+
     if Enum.member?(spliter_idxs, beam_idx) do
       advance_beam(
         other_beams,
-        {[beam_idx - 1, beam_idx + 1 | new_beams], splits + 1},
+        {Enum.uniq([beam_idx - 1, beam_idx + 1 | new_beams]), splits + 1},
         spliter_idxs
       )
     else
-      advance_beam(other_beams, {[beam_idx | new_beams], splits}, spliter_idxs)
+      advance_beam(other_beams, {Enum.uniq([beam_idx | new_beams]), splits}, spliter_idxs)
     end
   end
 end
