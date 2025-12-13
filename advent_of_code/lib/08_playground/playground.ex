@@ -12,51 +12,37 @@ defmodule AdventOfCode.Playground do
     |> distance_matrix()
     |> Enum.sort_by(&elem(&1, 2))
     |> Enum.take(1000)
-    |> Enum.reduce(%{}, &add_circuit/2)
-    |> Map.to_list()
-    |> Enum.map(fn x -> length(MapSet.to_list(elem(x, 1))) end)
+    |> Enum.reduce(MapSet.new(), &add_circuit/2)
+    |> MapSet.to_list()
+    |> Enum.map(fn x -> length(MapSet.to_list(x)) end)
     |> Enum.sort(:desc)
-
     |> Enum.take(3)
-    |> Enum.reduce(1,fn x,y -> x*y end)
-
-    #    |> length()
+    |> Enum.reduce(1, fn x, y -> x * y end)
   end
 
-  defp add_circuit({p1, p2, distance}, circuits) do
-    circuit_key_p1 =
-      for key <- Map.keys(circuits),
-          MapSet.member?(Map.get(circuits, key), p1),
-          do: key
-
-    circuit_key_p2 =
-      for key <- Map.keys(circuits),
-          MapSet.member?(Map.get(circuits, key), p2),
-          do: key
+  defp add_circuit({p1, p2, _}, circuits) do
+    circuit_1 = Enum.filter(circuits, &MapSet.member?(&1, p1))
+    circuit_2 = Enum.filter(circuits, &MapSet.member?(&1, p2))
 
     cond do
-      length(circuit_key_p1) == 0 and length(circuit_key_p2) == 0 ->
-        Map.put(circuits, distance, MapSet.new([p1, p2]))
+      circuit_1 == [] and circuit_2 == [] ->
+        MapSet.put(circuits, MapSet.new([p1, p2]))
 
-      length(circuit_key_p1) > 0 and length(circuit_key_p2) == 0 ->
-        Map.update(circuits, hd(circuit_key_p1), nil,fn x -> MapSet.put(x, p1) end)
+      circuit_1 != [] and circuit_2 == [] ->
+        MapSet.put(MapSet.delete(circuits, hd(circuit_1)), MapSet.put(hd(circuit_1), p2))
 
-      length(circuit_key_p1) ==0 and length(circuit_key_p2) >0 ->
-        Map.update(circuits, hd(circuit_key_p2),nil, fn x -> MapSet.put(x, p2) end)
+      circuit_1 == [] and circuit_2 != [] ->
+        MapSet.put(MapSet.delete(circuits, hd(circuit_2)), MapSet.put(hd(circuit_2), p1))
 
       true ->
-        merge(circuits, hd(circuit_key_p1), hd(circuit_key_p2))
+        merge(circuits, hd(circuit_1), hd(circuit_2))
     end
   end
 
-  defp merge(circuits, circuit_key_p1, circuit_key_p2) do
-    c1 = Map.get(circuits, circuit_key_p1)
-    c2 = Map.get(circuits, circuit_key_p2)
-
-    Map.put(
-      Map.drop(circuits, [circuit_key_p1, circuit_key_p2]),
-      circuit_key_p1,
-      MapSet.union(c1, c2)
+  defp merge(circuits, circuit_1, circuit_2) do
+    MapSet.put(
+      MapSet.delete(MapSet.delete(circuits, circuit_1), circuit_2),
+      MapSet.union(circuit_1, circuit_2)
     )
   end
 
