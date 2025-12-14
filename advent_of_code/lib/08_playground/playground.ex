@@ -1,23 +1,27 @@
 defmodule AdventOfCode.Playground do
   @moduledoc """
-  code for day 7 of AOC 2025
-  https://adventofcode.com/2025/day/7
+  code for day 8 of AOC 2025
+  https://adventofcode.com/2025/day/8
 
   """
 
   @file_name "input/input_day8.txt"
 
   def main_part2() do
-    pairs = load_data()
-    |> distance_matrix()
-    |> Enum.sort_by(&elem(&1, 2))
+    pairs =
+      load_data()
+      |> distance_matrix()
+      |> Enum.sort_by(&elem(&1, 2))
 
-    pairs
-    |> Stream.scan(MapSet.new(), &add_circuit/2)
-    |> Stream.map(&mapset_stats/1)
-    |> Stream.take_while(fn {circuits,switches} -> circuits >1 or switches<1000 end)
-    |> Enum.to_list()
-    |> length()
+    idx_full_circuit =
+      pairs
+      |> Stream.scan(MapSet.new(), &add_circuit/2)
+      |> Stream.map(&mapset_stats/1)
+      |> Stream.take_while(fn {circuits, switches} -> circuits > 1 or switches < 1000 end)
+      |> Enum.to_list()
+      |> length()
+
+    multiply_x_coord(Enum.at(pairs, idx_full_circuit))
   end
 
   def main_part1() do
@@ -31,6 +35,10 @@ defmodule AdventOfCode.Playground do
     |> Enum.sort(:desc)
     |> Enum.take(3)
     |> Enum.reduce(1, fn x, y -> x * y end)
+  end
+
+  defp multiply_x_coord({{x1, _, _}, {x2, _, _}, _}) do
+    x1 * x2
   end
 
   defp mapset_stats(mapset_acc) do
