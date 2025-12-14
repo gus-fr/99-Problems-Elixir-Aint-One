@@ -7,7 +7,20 @@ defmodule AdventOfCode.Playground do
 
   @file_name "input/input_day8.txt"
 
-  def main() do
+  def main_part2() do
+    pairs = load_data()
+    |> distance_matrix()
+    |> Enum.sort_by(&elem(&1, 2))
+
+    pairs
+    |> Stream.scan(MapSet.new(), &add_circuit/2)
+    |> Stream.map(&mapset_stats/1)
+    |> Stream.take_while(fn {circuits,switches} -> circuits >1 or switches<1000 end)
+    |> Enum.to_list()
+    |> length()
+  end
+
+  def main_part1() do
     load_data()
     |> distance_matrix()
     |> Enum.sort_by(&elem(&1, 2))
@@ -18,6 +31,17 @@ defmodule AdventOfCode.Playground do
     |> Enum.sort(:desc)
     |> Enum.take(3)
     |> Enum.reduce(1, fn x, y -> x * y end)
+  end
+
+  defp mapset_stats(mapset_acc) do
+    circuits = MapSet.to_list(mapset_acc)
+
+    num_switches =
+      Enum.reduce(circuits, MapSet.new(), &MapSet.union/2)
+      |> MapSet.to_list()
+      |> length()
+
+    {length(circuits), num_switches}
   end
 
   defp add_circuit({p1, p2, _}, circuits) do
