@@ -16,9 +16,30 @@ defmodule AdventOfCode.Movie do
   def main_part2() do
     data = load_data()
     contours = draw_contour(data)
-    data |> areas(contours)
-    |> Enum.max()
+    {upper,lower}=def_bounds(contours)
 
+
+    # data |> areas(contours)
+    # |> Enum.max()
+  end
+
+  defp def_bounds(contours) do
+    upper_x = Enum.to_list(contours)
+    |> Enum.map(&elem(&1,0))
+    |> Enum.reduce(0,&max/2)
+
+    lower_x = Enum.to_list(contours)
+    |> Enum.map(&elem(&1,0))
+    |> Enum.reduce(upper_x,&min/2)
+
+    upper_y = Enum.to_list(contours)
+    |> Enum.map(&elem(&1,1))
+    |> Enum.reduce(0,&max/2)
+
+    lower_y = Enum.to_list(contours)
+    |> Enum.map(&elem(&1,1))
+    |> Enum.reduce(upper_y,&min/2)
+    {{upper_x,upper_y},{lower_x,lower_y}}
   end
 
   defp load_data() do
@@ -31,7 +52,7 @@ defmodule AdventOfCode.Movie do
   defp draw_contour(points) do
     Stream.chunk_every(points, 2, 1, Stream.cycle(points))
     |> Stream.map(&line/1)
-    |> Enum.reduce(MapSet.new(),&MapSet.union()/2)
+    |> Enum.reduce(MapSet.new(), &MapSet.union/2)
   end
 
   defp line([{x1, y1}, {x2, y2}]) do
@@ -54,33 +75,26 @@ defmodule AdventOfCode.Movie do
     end
   end
 
-  defp areas(points,contour) do
-    for p1 <- points, p2 <- points, filter_points(p1,p2,contour), do: area(p1, p2)
+  defp areas(points, contour) do
+    for p1 <- points, p2 <- points, filter_points(p1, p2, contour), do: area(p1, p2)
   end
 
-  defp filter_points({x1,y1},{x2,y2},contour) do
-    if x1<= x2 do
-      :true
+  defp filter_points({x1, y1}, {x2, y2}, contour) do
+    if x1 <= x2 do
+      true
     else
-      if in_contour({x1,y2},contour) and in_contour({x2,y1},contour) do
-        :true
+      if in_contour({x1, y2}, contour) and in_contour({x2, y1}, contour) do
+        true
       end
-      :false
+
+      false
     end
   end
 
-  defp in_contour(point,contour) do
-    for p1 <- contour, p2 <- contour, point_in_line(point,p1,p2), do: :true
-
+  defp in_contour({x, y}, contour) do
+    #for p1 <- contour, p2 <- contour, point_in_line(point, p1, p2), do: true
   end
 
-  defp point_in_line({x,y},{x1,y1},{x2,y2}) do
-    cond do
-      x==x1 and x==x2 and min(y1,y2) <= y and y<= max(y1,y2) -> :true
-      y==y1 and y==y2 and min(x1,x2) <= x and x<= max(x1,x2) -> :true
-      :true -> :false
-    end
-  end
 
   defp areas(points) do
     for p1 <- points, p2 <- points, elem(p1, 0) <= elem(p2, 0), do: area(p1, p2)
