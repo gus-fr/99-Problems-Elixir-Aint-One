@@ -26,7 +26,11 @@ defmodule AdventOfCode.Movie do
       contours |> Enum.reduce(%{}, &reduce_index_x(&1, &2, elem(lower, 1), elem(upper, 1)))
 
     y_index =
-      contours |> Enum.reduce(%{}, &reduce_index_y(&1, &2, elem(lower, 0), elem(upper, 0)))
+      contours |> Enum.reduce(%{}, &reduce_index_y(&1, &2, elem(lower, 1), elem(upper, 1)))
+
+    File.write!("contours.txt", inspect(Enum.sort(contours), pretty: true, limit: :infinity))
+    File.write!("y_index.txt", inspect(y_index, pretty: true, limit: :infinity))
+    File.write!("x_index.txt", inspect(x_index, pretty: true, limit: :infinity))
 
     data
     |> areas(x_index, y_index)
@@ -34,15 +38,13 @@ defmodule AdventOfCode.Movie do
   end
 
   def reduce_index_x({x, y}, acc_map, min_y, max_y) do
-    Map.update(acc_map, x, {max_y, min_y}, fn {min_val, max_val} ->
-      {min(min_val, y), max(max_val, y)}
-    end)
+    {curr_min, curr_max} = Map.get(acc_map, x, {max_y, min_y})
+    Map.put(acc_map, x, {min(y, curr_min), max(y, curr_max)})
   end
 
   def reduce_index_y({x, y}, acc_map, min_x, max_x) do
-    Map.update(acc_map, y, {max_x, min_x}, fn {min_val, max_val} ->
-      {min(min_val, x), max(max_val, x)}
-    end)
+    {curr_min, curr_max} = Map.get(acc_map, y, {max_x, min_x})
+    Map.put(acc_map, y, {min(x, curr_min), max(x, curr_max)})
   end
 
   defp def_bounds(contours) do
