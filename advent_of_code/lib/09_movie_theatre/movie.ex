@@ -115,6 +115,7 @@ defmodule AdventOfCode.Movie do
     {lower_x2, upper_x2} = Map.get(y_index, y2)
 
     cond do
+      x1 <= x2 -> false
       y2 < lower_y1 -> false
       y2 > upper_y1 -> false
       x2 < lower_x1 -> false
