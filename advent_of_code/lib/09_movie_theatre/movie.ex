@@ -30,7 +30,7 @@ defmodule AdventOfCode.Movie do
 
     data
     |> areas(x_index, y_index)
-    # |> Enum.max()
+    |> Enum.max()
   end
 
   def reduce_index_x({x, y}, acc_map, min_y, max_y) do
@@ -117,7 +117,6 @@ defmodule AdventOfCode.Movie do
       y2 > upper_y1 -> false
       x2 < lower_x1 -> false
       x2 > upper_x1 -> false
-
       y1 < lower_y2 -> false
       y1 > upper_y2 -> false
       x1 < lower_x2 -> false
