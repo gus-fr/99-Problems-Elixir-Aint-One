@@ -9,15 +9,15 @@ defmodule AdventOfCode.Factory do
 
   def main_part1() do
     load_data()
+    |> Stream.map(&find_button_combination/1)
+    |> Stream.map(&length/1)
+    |> Enum.sum()
   end
 
   defp load_data() do
     File.stream!(@file_name)
     |> Stream.map(&String.trim/1)
     |> Stream.map(&parse_line/1)
-    |> Stream.map(&find_button_combination/1)
-    |> Stream.map(&length/1)
-    |> Enum.sum()
   end
 
   defp find_button_combination({final_state, buttons, _}) do
@@ -29,7 +29,9 @@ defmodule AdventOfCode.Factory do
     new_stack =
       for {state, history, unpressed_buttons} <- current_states,
           button <- unpressed_buttons,
-          do: {transition(state, button), [button | history], MapSet.delete(unpressed_buttons,button)}
+          do:
+            {transition(state, button), [button | history],
+             MapSet.delete(unpressed_buttons, button)}
 
     solutions = Enum.filter(new_stack, fn {state, _, _} -> state == final_state end)
 
