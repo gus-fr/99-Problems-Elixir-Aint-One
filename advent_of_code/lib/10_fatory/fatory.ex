@@ -14,12 +14,24 @@ defmodule AdventOfCode.Factory do
     |> Enum.sum()
   end
 
+  def main_part2() do
+    load_data()
+    |> Stream.map(&find_button_combination_v2/1)
+  end
+
   defp load_data() do
     File.stream!(@file_name)
     |> Stream.map(&String.trim/1)
     |> Stream.map(&parse_line/1)
   end
 
+  # **********************************bfs v2***************************************
+
+  defp find_button_combination_v2({_, buttons, joltage}) do
+    initial_state = Tuple.duplicate(0, tuple_size(joltage))
+  end
+
+  # ************************************ bfs V1 *************************************************
   defp find_button_combination({final_state, buttons, _}) do
     initial_state = Tuple.duplicate(false, tuple_size(final_state))
     bsf_search([{initial_state, [], buttons}], final_state)
@@ -47,12 +59,22 @@ defmodule AdventOfCode.Factory do
     end)
   end
 
+  # *************************** input parsing ***********************************
   defp parse_line(line) do
     parse_line_elements(Regex.run(~r/(\[.+\])(.+)(\{.+\})/, line))
   end
 
   defp parse_line_elements([_, indicators, buttons, joltage]) do
-    {parse_indicators(indicators), parse_buttons(buttons), joltage}
+    {parse_indicators(indicators), parse_buttons(buttons), parse_joltage(joltage)}
+  end
+
+  defp parse_joltage(joltage) do
+    String.replace(joltage, ~r/\{|\}/, "")
+    |> String.split(",")
+    |> Stream.map(&Integer.parse/1)
+    |> Stream.map(&elem(&1, 0))
+    |> Enum.to_list()
+    |> List.to_tuple()
   end
 
   defp parse_buttons(buttons) do
