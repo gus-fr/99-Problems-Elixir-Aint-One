@@ -37,11 +37,12 @@ defmodule AdventOfCode.Factory do
 
   defp bfs_search_joltage(current_states, final_state, buttons, level) do
     new_states =
-      (for state <- current_states,
-          button <- buttons,
-          do:
-            transition_joltage(state, button))
-            |> Enum.filter(&valid_state?(&1, final_state))
+      Stream.flat_map(current_states, fn state ->
+        Stream.map(buttons, fn button ->
+          transition_joltage(state, button)
+        end)
+      end)
+      |> Stream.filter(&valid_state?(&1, final_state))
 
     if Enum.any?(new_states, fn state -> state == final_state end) do
       level
