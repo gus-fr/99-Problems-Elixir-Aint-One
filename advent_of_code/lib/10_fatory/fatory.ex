@@ -16,6 +16,8 @@ defmodule AdventOfCode.Factory do
     |> Stream.map(&String.trim/1)
     |> Stream.map(&parse_line/1)
     |> Stream.map(&find_button_combination/1)
+    |> Stream.map(&length/1)
+    |> Enum.sum()
   end
 
   defp find_button_combination({final_state, buttons, _}) do
