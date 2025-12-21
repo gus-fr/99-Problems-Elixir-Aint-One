@@ -20,19 +20,19 @@ defmodule AdventOfCode.Factory do
 
   defp find_button_combination({final_state, buttons, _}) do
     initial_state = Tuple.duplicate(false, tuple_size(final_state))
-    bsf_search([{initial_state, []}], final_state, buttons)
+    bsf_search([{initial_state, [], buttons}], final_state)
   end
 
-  defp bsf_search(current_states, final_state, buttons) do
+  defp bsf_search(current_states, final_state) do
     new_stack =
-      for button <- buttons,
-          {state, history} <- current_states,
-          do: {transition(state, button), [button | history]}
+      for {state, history, unpressed_buttons} <- current_states,
+          button <- unpressed_buttons,
+          do: {transition(state, button), [button | history], MapSet.delete(unpressed_buttons,button)}
 
-    solutions = Enum.filter(new_stack, fn {state, _} -> state == final_state end)
+    solutions = Enum.filter(new_stack, fn {state, _, _} -> state == final_state end)
 
     case solutions do
-      [] -> bsf_search(new_stack, final_state, buttons)
+      [] -> bsf_search(new_stack, final_state)
       [solution | _] -> elem(solution, 1)
     end
   end
@@ -55,6 +55,7 @@ defmodule AdventOfCode.Factory do
     String.trim(buttons)
     |> String.split(" ")
     |> Enum.map(&parse_button/1)
+    |> MapSet.new()
   end
 
   defp parse_button(button) do
