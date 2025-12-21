@@ -29,31 +29,47 @@ defmodule AdventOfCode.Factory do
 
   defp find_button_combination_v2({_, buttons, joltage}) do
     initial_state = Tuple.duplicate(0, tuple_size(joltage))
-    bsf_search_joltage([{initial_state,0}],joltage,Enum.to_list(buttons))
+
+    buttons = Enum.to_list(buttons) |> Enum.sort(fn x, y -> length(x) >= length(y) end)
+
+    dfs_search_joltage(initial_state, joltage, buttons, 1)
   end
 
-  defp bsf_search_joltage(current_states, final_state, buttons) do
-    new_stack = (for {state,level} <- current_states,
-        button <- buttons,
-        #button_valid(button,state,final_state)
-        do:
-        {transition_joltage(state,button),level+1}
-    )
+  defp dfs_search_joltage(_, _, [], _) do
+    nil
+  end
 
-    solutions = Enum.filter(new_stack, fn {state, _} -> state == final_state end)
-    case solutions do
-      [] -> bsf_search_joltage(new_stack, final_state,buttons)
-      [solution | _] -> elem(solution, 1)
+  defp dfs_search_joltage(current_state, final_state, [button | buttons], level) do
+    new_state = transition_joltage(current_state, button)
+
+    value =
+      cond do
+        new_state == final_state -> level
+        invalid_state?(new_state, final_state) -> nil
+        true -> dfs_search_joltage(new_state, final_state, [button | buttons], level + 1)
+      end
+
+    if value == nil do
+      dfs_search_joltage(new_state, final_state, buttons, level + 1)
+    else
+      value
     end
-
   end
 
-  defp transition_joltage(joltages,button) do
-      Enum.reduce(button, joltages, fn x, joltage ->
-      put_elem(joltage, x, elem(joltage, x)+1)
+  defp invalid_state?(state, final_state) do
+    out_of_range =
+      for i <- 0..(tuple_size(state) - 1),
+          do: elem(state, i) > elem(final_state, i)
+
+    Enum.any?(out_of_range)
+  end
+
+  defp transition_joltage(joltages, button) do
+
+    Enum.reduce(button, joltages, fn x, joltage ->
+      put_elem(joltage, x, elem(joltage, x) + 1)
     end)
   end
-
 
   # ************************************ bfs V1 *************************************************
   defp find_button_combination({final_state, buttons, _}) do
