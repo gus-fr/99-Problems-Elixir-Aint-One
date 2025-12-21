@@ -29,7 +29,31 @@ defmodule AdventOfCode.Factory do
 
   defp find_button_combination_v2({_, buttons, joltage}) do
     initial_state = Tuple.duplicate(0, tuple_size(joltage))
+    bsf_search_joltage([{initial_state,0}],joltage,Enum.to_list(buttons))
   end
+
+  defp bsf_search_joltage(current_states, final_state, buttons) do
+    new_stack = (for {state,level} <- current_states,
+        button <- buttons,
+        #button_valid(button,state,final_state)
+        do:
+        {transition_joltage(state,button),level+1}
+    )
+
+    solutions = Enum.filter(new_stack, fn {state, _} -> state == final_state end)
+    case solutions do
+      [] -> bsf_search_joltage(new_stack, final_state,buttons)
+      [solution | _] -> elem(solution, 1)
+    end
+
+  end
+
+  defp transition_joltage(joltages,button) do
+      Enum.reduce(button, joltages, fn x, joltage ->
+      put_elem(joltage, x, elem(joltage, x)+1)
+    end)
+  end
+
 
   # ************************************ bfs V1 *************************************************
   defp find_button_combination({final_state, buttons, _}) do
