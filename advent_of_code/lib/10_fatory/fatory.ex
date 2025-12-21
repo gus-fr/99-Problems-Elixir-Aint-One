@@ -32,40 +32,33 @@ defmodule AdventOfCode.Factory do
 
     buttons = Enum.to_list(buttons) |> Enum.sort(fn x, y -> length(x) >= length(y) end)
 
-    dfs_search_joltage(initial_state, joltage, buttons, 1)
+    bfs_search_joltage([initial_state], joltage, buttons, 1)
   end
 
-  defp dfs_search_joltage(_, _, [], _) do
-    nil
-  end
+  defp bfs_search_joltage(current_states, final_state, buttons, level) do
+    new_states =
+      (for state <- current_states,
+          button <- buttons,
+          do:
+            transition_joltage(state, button))
+            |> Enum.filter(&valid_state?(&1, final_state))
 
-  defp dfs_search_joltage(current_state, final_state, [button | buttons], level) do
-    new_state = transition_joltage(current_state, button)
-
-    value =
-      cond do
-        new_state == final_state -> level
-        invalid_state?(new_state, final_state) -> nil
-        true -> dfs_search_joltage(new_state, final_state, [button | buttons], level + 1)
-      end
-
-    if value == nil do
-      dfs_search_joltage(new_state, final_state, buttons, level + 1)
+    if Enum.any?(new_states, fn state -> state == final_state end) do
+      level
     else
-      value
+      bfs_search_joltage(new_states, final_state, buttons, level + 1)
     end
   end
 
-  defp invalid_state?(state, final_state) do
+  defp valid_state?(state, final_state) do
     out_of_range =
       for i <- 0..(tuple_size(state) - 1),
-          do: elem(state, i) > elem(final_state, i)
+          do: elem(state, i) <= elem(final_state, i)
 
-    Enum.any?(out_of_range)
+    Enum.all?(out_of_range)
   end
 
   defp transition_joltage(joltages, button) do
-
     Enum.reduce(button, joltages, fn x, joltage ->
       put_elem(joltage, x, elem(joltage, x) + 1)
     end)
