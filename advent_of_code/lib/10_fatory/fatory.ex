@@ -17,6 +17,8 @@ defmodule AdventOfCode.Factory do
   def main_part2() do
     load_datav2()
     |> Stream.map(&find_button_combination_v2/1)
+    |> Stream.map(fn x -> Enum.map(x,&elem(&1,1)) end)
+    |> Stream.map(&Enum.min/1)
   end
 
   defp load_data() do
