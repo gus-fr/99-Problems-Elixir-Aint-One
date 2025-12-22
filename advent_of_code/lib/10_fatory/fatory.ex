@@ -60,13 +60,13 @@ defmodule AdventOfCode.Factory do
          target_joltage_state
        ) do
     new_states =
-      for(
-        {state, level} <- joltage_states,
-        button <- buttons,
-        do: {transition_joltage(state, button), level + 1}
-      )
-      |> Enum.filter(&valid_state?(elem(&1, 0), target_joltage_state))
-      |> Enum.uniq_by(&elem(&1, 0))
+      (Stream.flat_map(joltage_states, fn {state, level} ->
+        Stream.map(buttons, fn button ->
+          {transition_joltage(state, button), level + 1}
+        end)
+      end)
+      |> Stream.filter(&valid_state?(elem(&1, 0), target_joltage_state))
+      |> Enum.uniq_by(&elem(&1, 0)))
 
     search_until_single_target(
       Enum.filter(
@@ -120,6 +120,7 @@ defmodule AdventOfCode.Factory do
   end
 
   defp valid_state?(state, final_state) do
+
     out_of_range =
       for i <- 0..(tuple_size(state) - 1),
           do: elem(state, i) <= elem(final_state, i)
