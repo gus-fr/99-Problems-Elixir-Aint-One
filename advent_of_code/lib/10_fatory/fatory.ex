@@ -15,7 +15,7 @@ defmodule AdventOfCode.Factory do
   end
 
   def main_part2() do
-    load_data()
+    load_datav2()
     |> Stream.map(&find_button_combination_v2/1)
   end
 
@@ -25,30 +25,96 @@ defmodule AdventOfCode.Factory do
     |> Stream.map(&parse_line/1)
   end
 
+  defp load_datav2() do
+    File.stream!(@file_name)
+    |> Stream.map(&String.trim/1)
+    |> Stream.map(&parse_linev2/1)
+  end
+
   # **********************************bfs v2***************************************
 
   defp find_button_combination_v2({_, buttons, joltage}) do
     initial_state = Tuple.duplicate(0, tuple_size(joltage))
 
-    buttons = Enum.to_list(buttons) |> Enum.sort(fn x, y -> length(x) >= length(y) end)
+    sorted_indices =
+      Tuple.to_list(joltage)
+      |> Enum.zip(0..(tuple_size(joltage) - 1))
+      |> Enum.sort(:asc)
+      |> Enum.map(&elem(&1, 1))
 
-    bfs_search_joltage([initial_state], joltage, buttons, 1)
+    focused_bfs([{initial_state, 0}], buttons, joltage, sorted_indices)
   end
 
-  defp bfs_search_joltage(current_states, final_state, buttons, level) do
-    new_states =
-      Stream.flat_map(current_states, fn state ->
-        Stream.map(buttons, fn button ->
-          transition_joltage(state, button)
-        end)
-      end)
-      |> Stream.filter(&valid_state?(&1, final_state))
+  defp search_until_single_target([], acc, _, _, _) do
+    acc
+  end
 
-    if Enum.any?(new_states, fn state -> state == final_state end) do
-      level
-    else
-      bfs_search_joltage(new_states, final_state, buttons, level + 1)
-    end
+  # AdventOfCode.Factory.main_part2 |> Stream.take(1) |> Enum.to_list
+  defp search_until_single_target(
+         joltage_states,
+         acc_reults,
+         buttons,
+         {target_joltage, target_index},
+         target_joltage_state
+       ) do
+    new_states =
+      for(
+        {state, level} <- joltage_states,
+        button <- buttons,
+        do: {transition_joltage(state, button), level + 1}
+      )
+      |> Enum.filter(&valid_state?(elem(&1, 0), target_joltage_state))
+      |> Enum.uniq_by(&elem(&1, 0))
+
+    search_until_single_target(
+      Enum.filter(
+        new_states,
+        &does_not_have_joltage_at?(elem(&1, 0), target_joltage, target_index)
+      ),
+      Enum.filter(new_states, &has_joltage_at?(elem(&1, 0), target_joltage, target_index)) ++
+        acc_reults,
+      buttons,
+      {target_joltage, target_index},
+      target_joltage_state
+    )
+  end
+
+  defp has_joltage_at?(state, joltage, index) do
+    elem(state, index) == joltage
+  end
+
+  defp does_not_have_joltage_at?(state, joltage, index) do
+    elem(state, index) != joltage
+  end
+
+  defp focused_bfs(states, _, _, []) do
+    states
+  end
+
+  defp focused_bfs(states, buttons, joltage, [index | indices]) do
+    new_states =
+      search_until_single_target(
+        Enum.filter(states, &does_not_have_joltage_at?(elem(&1, 0), elem(joltage, index), index)),
+        Enum.filter(states, &has_joltage_at?(elem(&1, 0), elem(joltage, index), index)),
+        select_buttons_with_value(buttons, index),
+        {elem(joltage, index), index},
+        joltage
+      )
+
+    focused_bfs(
+      new_states,
+      remove_buttons_with_value(buttons, index),
+      joltage,
+      indices
+    )
+  end
+
+  defp select_buttons_with_value(buttons, value) do
+    Enum.filter(buttons, fn button -> value in button end)
+  end
+
+  defp remove_buttons_with_value(buttons, value) do
+    Enum.filter(buttons, fn button -> value not in button end)
   end
 
   defp valid_state?(state, final_state) do
@@ -91,6 +157,21 @@ defmodule AdventOfCode.Factory do
     Enum.reduce(button, indicator, fn x, indicator ->
       put_elem(indicator, x, not elem(indicator, x))
     end)
+  end
+
+  # *********************************************************************************
+  defp parse_linev2(line) do
+    parse_line_elementsv2(Regex.run(~r/(\[.+\])(.+)(\{.+\})/, line))
+  end
+
+  defp parse_line_elementsv2([_, indicators, buttons, joltage]) do
+    {parse_indicators(indicators), parse_buttonsv2(buttons), parse_joltage(joltage)}
+  end
+
+  defp parse_buttonsv2(buttons) do
+    String.trim(buttons)
+    |> String.split(" ")
+    |> Enum.map(&parse_button/1)
   end
 
   # *************************** input parsing ***********************************
