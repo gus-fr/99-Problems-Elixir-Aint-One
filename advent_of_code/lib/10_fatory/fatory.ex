@@ -17,7 +17,7 @@ defmodule AdventOfCode.Factory do
   def main_part2() do
     load_datav2()
     |> Stream.map(&find_button_combination_v2/1)
-    |> Stream.map(fn x -> Enum.map(x,&elem(&1,1)) end)
+    |> Stream.map(fn x -> Enum.map(x, &elem(&1, 1)) end)
     |> Stream.map(&Enum.min/1)
   end
 
@@ -59,21 +59,19 @@ defmodule AdventOfCode.Factory do
          {target_joltage, target_index},
          target_joltage_state
        ) do
-    new_states =
-      (Stream.flat_map(joltage_states, fn {state, level} ->
+    {accumulated_results, new_states} =
+      Stream.flat_map(joltage_states, fn {state, level} ->
         Stream.map(buttons, fn button ->
           {transition_joltage(state, button), level + 1}
         end)
       end)
       |> Stream.filter(&valid_state?(elem(&1, 0), target_joltage_state))
-      |> Enum.uniq_by(&elem(&1, 0)))
+      |> Enum.uniq_by(&elem(&1, 0))
+      |> Enum.split_with(&has_joltage_at?(elem(&1, 0), target_joltage, target_index))
 
     search_until_single_target(
-      Enum.filter(
-        new_states,
-        &does_not_have_joltage_at?(elem(&1, 0), target_joltage, target_index)
-      ),
-      Enum.filter(new_states, &has_joltage_at?(elem(&1, 0), target_joltage, target_index)) ++
+      new_states,
+      accumulated_results ++
         acc_reults,
       buttons,
       {target_joltage, target_index},
@@ -120,7 +118,6 @@ defmodule AdventOfCode.Factory do
   end
 
   defp valid_state?(state, final_state) do
-
     out_of_range =
       for i <- 0..(tuple_size(state) - 1),
           do: elem(state, i) <= elem(final_state, i)
